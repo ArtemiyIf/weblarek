@@ -20,3 +20,31 @@ export const settings = {
 
 };
 
+export const eventNames = {
+    CATALOG_SET_ITEMS: 'catalog:setItems',
+    CATALOG_SET_CURRENT_ITEM: 'catalog:setCurrentItem',
+
+    BASKET_OPEN: 'basket:open',
+    BASKET_CHECKOUT: 'basket:checkout',
+    BASKET_ADD_ITEM: 'basket:addItem',
+    BASKET_DELETE_ITEM: 'basket:deleteItem',
+    BASKET_CLEAR: 'basket:clear',
+
+    CARD_BASKET_DELETE_ITEM: 'cardBasket:deleteItem',
+    CARD_CATALOG_SELECTED: 'cardCatalog:selected',
+
+    ORDER_FORM_SET_PAYMENT: 'orderForm:setPayment',
+    ORDER_FORM_SET_ADDRESS: 'orderForm:setAddress',
+    ORDER_FORM_SUBMIT: 'orderForm:submit',
+
+    CONTACTS_FORM_SET_EMAIL: 'contactsForm:setEmail',
+    CONTACTS_FORM_SET_PHONE: 'contactsForm:setPhone',
+    CONTACTS_FORM_SUBMIT: 'contactForm:submit',
+
+    CUSTOMER_SET_PAYMENT: 'customer:setPayment',
+    CUSTOMER_SET_ADDRESS: 'customer:setAddress',
+    CUSTOMER_SET_PHONE: 'customer:setPhone',
+    CUSTOMER_SET_EMAIL: 'customer:setEmail',
+
+    ORDER_SUCCESS_CLICK_CLOSE: 'orderSuccess:clickClose',
+};

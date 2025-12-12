@@ -98,3 +98,109 @@ Presenter - презентер содержит основную логику п
 `emit<T extends object>(event: string, data?: T): void` - инициализация события. При вызове события в метод передается название события и объект с данными, который будет использован как аргумент для вызова обработчика.  
 `trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void` - возвращает функцию, при вызове которой инициализируется требуемое в параметрах событие с передачей в него данных из второго параметра.
 
+### Данные
+
+#### Товар 
+
+```
+interface IProduct {
+  id: string; - уникальный идентификатор товара
+  description: string; - подробное описание товара
+  image: string; - URL изображения товара
+  title: string; - название товара
+  category: string; - группа (категория) товара
+  price: number | null; - цена (может быть null, если цена не указана)
+}
+```
+
+#### Покупатель
+
+```
+type TPayment = 'card' | 'cash'; - способ оплаты
+```
+
+```
+interface IBuyer {
+  payment: TPayment; - выбранный способ оплаты
+  email: string; - электронная почта покупателя
+  phone: string; - номер телефона покупателя
+  address: string; - адрес доставки
+}
+```
+
+### Модели данных
+
+#### Class Catalog
+
+Назначение: хранение и управление данными о товарах каталога.
+
+Поля класса:
+
+`private _items: IProduct[]` -  массив всех товаров каталога;
+`private _currentItem: IProduct | null` - текущий выбранный товар для детального отображения.
+
+Методы:
+
+`setItems(items: IProduct[]): void` - массив товаров для сохранения.
+`getItems(): IProduct[]` - Возвращает: массив всех товаров из _items.
+`getItem(id: string): IProduct | null` - Параметр: id — идентификатор товара.
+Возвращает: найденный товар или null, если товар не найден.
+`setCurrentItem(item: IProduct): void` - Параметр: item — товар для установки как текущего.
+Назначение: сохраняет товар в _currentItem.
+`getCurrentItem(): IProduct | null` - Возвращает: текущий выбранный товар или null
+
+#### Class Basket
+
+Назначение: управление товарами, выбранными для покупки.
+
+Поле класса:
+
+`private _items: IProduct[]` - массив выбранных товаров.
+
+Методы:
+
+`getItems(): IProduct[]` - Возвращает: массив товаров в корзине
+`addItem(item: IProduct): void` -  добавляет товар в `_items`, если его ещё нет в корзине.
+`removeItem(item: IProduct): void` -  удаляет товар из `_items`.
+`clear(): void` - очищает корзину (устанавливает `_items = []`).
+`getTotalPrice(): number` - Возвращает: общую стоимость товаров в корзине.
+`getTotalItems(): number` - Возвращает: количество товаров в корзине.
+`hasItem(id: string): boolean` - true если в корзине есть тавар с соответствующем`id`
+
+#### Class Buyer
+
+Назначение: хранение и валидация данных покупателя.
+
+Поля класса:
+
+`private _payment: TPayment` - способ оплаты
+`private _email: string` - email покупателя
+`private _phone: string` - телефон покупателя
+`private _address: string` - адрес доставки.
+
+Методы:
+
+`setPayment(payment: TPayment): void` -  устанавливает способ оплаты
+`setEmail(email: string): void` - устанавливает email
+`setPhone(phone: string): void` - устанавливает телефон
+`setAddress(address: string): void` - устанавливает адрес
+`getData(): IBuyer` - Возвращает: объект с текущими данными покупателя
+`clear(): void` -  сбрасывает все поля
+`checkValidity(): Partial<{ [K in keyof IBuyer]: string }>` - Возвращает: объект с ошибками валидации. Если поле валидно, оно отсутствует в объекте.
+
+#### Слой коммуникации
+
+#### ProductApi
+
+Назначение: взаимодействие с сервером для получения каталога товаров и отправки заказа.
+
+Конструктор:
+
+`constructor(api: IApi)` - Параметр: api — объект, реализующий интерфейс IApi.
+
+Методы:
+
+`getProducts(): Promise<IGetProductsApiResponse>` - Выполняет GET‑запрос на /product/.
+Возвращает: промис с ответом сервера (интерфейс IGetProductsApiResponse).
+`order(data: IOrderApiRequest): Promise<IOrderApiResponse>` - Выполняет POST‑запрос на /order/.
+
