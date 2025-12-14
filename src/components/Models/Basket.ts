@@ -3,9 +3,13 @@ import { IProduct } from '../../types';
 export class Basket {
   private _items: IProduct[] = [];
 
+  constructor() {};
+
   getItems(): IProduct[] {
     return this._items;
-  }addItem(item: IProduct): void {
+  }
+  
+  addItem(item: IProduct): void {
     if (!this._items.some(i => i.id === item.id)) {
       this._items.push(item);
     }

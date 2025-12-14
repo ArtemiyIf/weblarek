@@ -1,4 +1,10 @@
-import {IApi, IGetProductsApiResponse, IOrderApiRequest, IOrderApiResponse} from '../types';
+import {
+  IApi,
+  IGetProductsApiResponse,
+  IOrderApiRequest,
+  IOrderApiResponse,
+  IApiError
+} from '../types';
 
 export class ProductApi {
   private api: IApi;
@@ -9,34 +15,39 @@ export class ProductApi {
 
   async getProducts(): Promise<IGetProductsApiResponse> {
     try {
-      const response = await this.api.get<IGetProductsApiResponse>('/product/');
-      return response;
+      return await this.api.get<IGetProductsApiResponse>('/product/');
     } catch (error) {
       return {
-        success: false,
-        data: [],
         total: 0,
-        message: error instanceof Error ? error.message : 'Ошибка загрузки товаров'
+        items: []
       };
     }
   }
 
-  async order(data: IOrderApiRequest): Promise<IOrderApiResponse> {
-    try {
-      const response = await this.api.post<IOrderApiResponse>(
-        '/order/',
-        data,
-        'POST'
-      );
-      return response;
-    } catch (error) {
-      return {
-        success: false,
-        status: 'failed',
-        message: error instanceof Error
-          ? `Ошибка отправки заказа: ${error.message}`
-          : 'Неизвестная ошибка при отправке заказа'
-      };
+  async order(
+  data: IOrderApiRequest
+): Promise<IOrderApiResponse | IApiError> {
+  try {
+    const response = await this.api.post<IOrderApiResponse>(
+      '/order',
+      data,
+      'POST'
+    );
+    return response;
+  } catch (error) {
+    if (error instanceof Response) {
+      try {
+        const json = await error.json();
+        if (typeof json.error === 'string') {
+          return { error: json.error }; 
+        }
+      } catch (jsonError) {
+        return { error: 'Не удалось обработать ответ сервера' };
+      }
     }
+    return {
+      error: 'Неизвестная ошибка при отправке заказа'
+    };
   }
+}
 }

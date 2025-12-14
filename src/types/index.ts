@@ -1,8 +1,12 @@
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
 export interface IApi {
-    get<T extends object>(uri: string): Promise<T>;
-    post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
+  get<T extends object>(uri: string): Promise<T>;
+  post<T extends object>(
+    uri: string,
+    data: object,
+    method?: ApiPostMethods
+  ): Promise<T>;
 }
 
 export interface IProduct {
@@ -24,31 +28,24 @@ export interface IBuyer {
 }
 
 export interface IGetProductsApiResponse {
-  success: boolean;
-  data: IProduct[];
   total: number;
-  message?: string;
+  items: IProduct[]; // именно items, а не data!
 }
 
 export interface IOrderApiRequest {
-  buyer: IBuyer;
-  items: IProduct[];
-  totalAmount: number;
+  payment: TPayment;
+  email: string;
+  phone: string;
+  address: string;
+  total: number; // в API-ответе поле называется total, а не totalAmount
+  items: string[]; // массив ID товаров (не {productId, quantity})
 }
 
 export interface IOrderApiResponse {
-  success: boolean;
-  orderId?: string;
-  status: 'created' | 'confirmed' | 'failed';
-  message: string;
+  id: string; // в ответе API поле id, а не orderId
+  total: number; // возвращаем общую сумму
 }
 
-export interface IApi {
-  get<T extends object>(uri: string): Promise<T>;
-  post<T extends object>(
-    uri: string,
-    data: object,
-    method?: 'POST' | 'PUT' | 'DELETE'
-  ): Promise<T>;
+export interface IApiError {
+  error: string;
 }
-
