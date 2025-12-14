@@ -17,37 +17,36 @@ export class ProductApi {
     try {
       return await this.api.get<IGetProductsApiResponse>('/product/');
     } catch (error) {
-      return {
-        total: 0,
-        items: []
-      };
+      // Корректная обработка ошибки без возврата данных
+      console.error('Ошибка при получении продуктов:', error);
+      throw error; // Перебрасываем ошибку дальше
     }
   }
 
   async order(
-  data: IOrderApiRequest
-): Promise<IOrderApiResponse | IApiError> {
-  try {
-    const response = await this.api.post<IOrderApiResponse>(
-      '/order',
-      data,
-      'POST'
-    );
-    return response;
-  } catch (error) {
-    if (error instanceof Response) {
-      try {
-        const json = await error.json();
-        if (typeof json.error === 'string') {
-          return { error: json.error }; 
+    data: IOrderApiRequest
+  ): Promise<IOrderApiResponse | IApiError> {
+    try {
+      const response = await this.api.post<IOrderApiResponse>(
+        '/order',
+        data,
+        'POST'
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof Response) {
+        try {
+          const json = await error.json();
+          if (typeof json.error === 'string') {
+            return { error: json.error };  
+          }
+        } catch (jsonError) {
+          return { error: 'Не удалось обработать ответ сервера' };
         }
-      } catch (jsonError) {
-        return { error: 'Не удалось обработать ответ сервера' };
       }
+      return {
+        error: 'Неизвестная ошибка при отправке заказа'
+      };
     }
-    return {
-      error: 'Неизвестная ошибка при отправке заказа'
-    };
   }
-}
 }

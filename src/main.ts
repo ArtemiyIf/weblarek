@@ -5,7 +5,7 @@ import { Buyer } from './components/Models/Buyer';
 import { ProductApi } from './services/ProductApi';
 import { IApi, IOrderApiRequest } from './types';
 import { apiProducts } from './utils/data';
-import { Api } from './components/base/Api.ts'; // Импортируем готовый Api
+import { Api } from './components/base/Api.ts';
 
 // Создаём экземпляр API с реальным URL
 const apiClient = new Api('http://localhost:5173/api/weblarek', {
@@ -68,12 +68,14 @@ productApi.getProducts()
         console.error('Ошибка getProducts:', error);
     });
 
-// Формируем корректный orderData согласно IOrderApiRequest
+// Оптимизированное формирование orderData
+const buyerData = buyer.getData(); // Сохраняем результат в константу
+
 const orderData: IOrderApiRequest = {
-    payment: buyer.getData().payment,
-    email: buyer.getData().email,
-    phone: buyer.getData().phone,
-    address: buyer.getData().address,
+    payment: buyerData.payment,
+    email: buyerData.email,
+    phone: buyerData.phone,
+    address: buyerData.address,
     total: basket.getTotalPrice(),
     items: basket.getItems().map(item => item.id)
 };
