@@ -1,4 +1,12 @@
+import {categoryMap} from '../utils/constants.ts';
+
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+
+export interface IApi {
+    get<T extends object>(uri: string): Promise<T>;
+
+    post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
+}
 
 export interface IApi {
   get<T extends object>(uri: string): Promise<T>;
@@ -49,3 +57,5 @@ export interface IOrderApiResponse {
 export interface IApiError {
   error: string;
 }
+
+export type TCategoryNames = keyof typeof categoryMap;

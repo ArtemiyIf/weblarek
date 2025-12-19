@@ -204,3 +204,244 @@ interface IBuyer {
 Возвращает: промис с ответом сервера (интерфейс IGetProductsApiResponse).
 `order(data: IOrderApiRequest): Promise<IOrderApiResponse>` - Выполняет POST‑запрос на /order/.
 
+
+### View
+
+#### Class Header
+
+Назначение
+
+Отоброжение главной страницы
+
+Конструктор
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Поля 
+
+`basketButton: HTMLButtonElement` - открытие корзины
+`counterElement: HTMLElement` - элемент, отображающий количество товаров в корзине
+
+Методы 
+
+`set counter(value: number)` - счётчик заказов
+
+#### Class Gallery 
+
+Назначение 
+
+Отображение товаров на странице
+
+Конструктор
+ 
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Поля 
+
+`catalogElement: HTMLElement` - служит контейнером (корневым узлом) для отображения каталога товаров.
+
+Методы 
+
+`set catalog(items: HTMLElement[])` - принимает массив HTML‑элементов и отображает в интерфейсе
+
+#### Class Modal
+
+Назначение 
+
+Для отображения и закрытия модальных окан на главной странице 
+
+Конструктор 
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+
+Поля
+
+`ModalCloseButtonElement: HTMLButtonElement` - кнопка закрытия окна
+`ModalContentElement: HTMLElement` - контент модального окна
+
+Методы 
+
+`setData(element: HTMLElement)` - принимает данные из формы в модальном окне
+`open()` - открывает модальное окно
+`close()` - закрывает модальное окно
+
+#### Class Success 
+
+Назначение 
+
+Оформление заказа
+
+Поля
+
+`description: HTMLElement` - уведомление о списании
+`orderButtonCloseElement: HTMLButtonElement` - кнопка закрытия окна
+`orderTitleElement: HTMLElement` - заголовок заказа
+
+Конструктор
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Методы
+
+`set total(value: number): void` - показывает итоговую сумму списания
+
+### Class Card 
+
+Назначение
+
+Общий родительский класс для всех карточек
+
+Конструктор
+
+`constructor(container: HTMLElement)` - принимает контейнер
+
+Поля
+
+`titleElem: HTMLElement` - Заголовок
+`priceElem: HTMLElement` - Цена товара
+
+Метод 
+
+`getId()` - получаем id товара
+`setId(id: string)` - устанавливаем id
+`set title(value: string)` - устанавливаем название
+`set price(value: number | null)` - устанавливаем цену 
+
+### Class CardCatalog
+
+Назначение
+
+Отображает карточки таваров в каталоге
+
+Конструктор
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Методы 
+
+`set category(category: TCategoryNames)` — Устанавливает категорю
+`set image(imageSrc: string)` - ссылка на изображение
+
+### Class CardPriview
+
+Назначение 
+
+Отображает предпросмотр карточки товара с возможностью добавления в корзину.
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Методы 
+
+`set category(category: TCategoryNames)` - устанавливает категорию товара
+`set description(description: string)` - описание товара
+`set image(imageSrc: string)` - ссылка на изображение
+`set canBuy(canBuy: boolean)` - не даёт добавить товар в корзину если он уже там
+`set buttonText(buttonText: string)` - позволяет динамически менять текст на кнопке внутри компонента 
+
+### Class CardBasket
+
+Назначение 
+
+Отображает данные в корзине товаров
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Методы 
+
+`setIndex(value: number)` - Нумерация товаров
+
+
+Поля 
+
+`basketItemIndex: HTMLElement` - элемент отображение нумерации
+`cardItemDelete: HTMLButtonElement` - кнопка удаления товара
+
+### Class BasketViwe
+
+Назначение 
+
+Отображает данные в корзине товаров
+
+Конструктор
+
+`events: IEvents` -  в конструкторе класса указывает на передачу объекта, реализующего интерфейс
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Методы
+
+`set items(value: HTMLElement[]): void` - список товаров
+`set total(value: number): void` - итоговая сумма заказа
+
+
+Поля 
+
+`basketListElement: HTMLElement` - список товаров в корзине (контейнер)
+`basketButtonOrderElement: HTMLButtonElement` - кнопка заказа
+`basketPriceElement: HTMLElement` - итоговая сумма
+
+### Form
+
+Назначение 
+
+Родительский класс форм
+
+Конструктор
+
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+ПОля
+
+`submitBtnElem: HTMLButtonElement` - ссылка на DOM‑элемент кнопки отвечает за отправку формы
+`errorsElem: HTMLElement` - отображения сообщений об ошибках
+
+Методы
+
+`set error(error: string)` - сообщение об ошибке
+
+### OrderForm
+
+Назначение 
+
+Форма оформления заказа
+
+Конструктор
+
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Поля
+
+`paymentBtnElems: HTMLButtonElement[]` - отвечает за выбор оплаты
+`addressInputElem: HTMLInputElement` - отвечает за ввод адреса покупателя
+
+Методы 
+
+`set payment(payment: TPayment): void` - активная кнопка оплаты
+`set address(address: string)` - заполняем форму адреса
+`setTypeOfPayment(value: Tpayment)` - оплата картой или наличными
+`validateForm(errors: IErrors): void` - проверяет корректность введённых данных и при обнаружении ошибок заполняет объект errors соответствующими сообщениями
+
+### ContactsForm
+
+Назначение
+
+Форма заполнения контактных данных покупатея
+
+Конструктор 
+
+`container: HTMLElement` - принимает в качестве параметра HTML‑элемент (контейнер), в котором он будет «жить» и работать.
+
+Поля 
+
+`emailInputElem: HTMLInputElement` - поле ввода email
+`phoneInputElem: HTMLInputElement` - поле ввода номера телефона
+
+Методы
+
+`set email(email: string)` - заполняет поле ввода электронной почты
+`set phone(phone: string)` — заполняет поле ввода номера телефона

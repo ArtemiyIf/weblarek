@@ -1,37 +1,44 @@
 import { IProduct } from '../../types';
+import { EventEmitter } from '../base/Events';
 
 export class Basket {
-  private _items: IProduct[] = [];
+    private _items: IProduct[] = [];
+    private events: EventEmitter;
 
-  constructor() {};
-
-  getItems(): IProduct[] {
-    return this._items;
-  }
-  
-  addItem(item: IProduct): void {
-    if (!this._items.some(i => i.id === item.id)) {
-      this._items.push(item);
+    constructor(events: EventEmitter) {
+        this.events = events;
     }
-  }
 
-  removeItem(item: IProduct): void {
-    this._items = this._items.filter(i => i.id !== item.id);
-  }
+    getItems(): IProduct[] {
+        return this._items;
+    }
 
-  clear(): void {
-    this._items = [];
-  }
+    addItem(item: IProduct): void {
+        if (!this.hasItem(item.id)) {
+            this._items.push(item);
+            this.events.emit('basket:changed', this._items);
+        }
+    }
 
-  getTotalPrice(): number {
-    return this._items.reduce((sum, item) => sum + (item.price ?? 0), 0);
-  }
+    removeItem(id: string): void {
+        this._items = this._items.filter(item => item.id !== id);
+        this.events.emit('basket:changed', this._items);
+    }
 
-  getTotalItems(): number {
-    return this._items.length;
-  }
+    clear(): void {
+        this._items = [];
+        this.events.emit('basket:changed', this._items);
+    }
 
-  hasItem(id: string): boolean {
-    return this._items.some(item => item.id === id);
-  }
+    getTotalPrice(): number {
+        return this._items.reduce((sum, item) => sum + (item.price || 0), 0);
+    }
+
+    getTotalItems(): number {
+        return this._items.length;
+    }
+
+    hasItem(id: string): boolean {
+        return this._items.some(item => item.id === id);
+    }
 }
