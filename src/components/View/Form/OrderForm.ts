@@ -3,7 +3,9 @@ import { IBuyer, TPayment} from '../../../types';
 import { IEvents } from '../../base/Events';
 import { ensureAllElements, ensureElement } from "../../../utils/utils";
 
-type TOrderForm = Pick<IBuyer, 'address' | 'payment'>;
+type TOrderForm = Pick<IBuyer, 'address' | 'payment'> & {
+    error?: string;
+};
 
 export class OrderForm extends Form<TOrderForm> {
     protected paymentBtns: HTMLButtonElement[];

@@ -1,10 +1,10 @@
 import {Component} from '../base/Component.ts';
 
-type TGalleryViewData = {
+type TGalleryData = {
     items: HTMLElement[];
 }
 
-export class GalleryView extends Component<TGalleryViewData> {
+export class Gallery extends Component<TGalleryData> {
     constructor(protected readonly container: HTMLElement) {
         super(container);
     }

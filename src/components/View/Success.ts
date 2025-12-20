@@ -14,7 +14,7 @@ export class Success extends Component<TSuccessData> {
   constructor(protected events: IEvents, protected container: HTMLElement) {
     super(container);
     this.description = ensureElement<HTMLElement>('.order-success__description', this.container);
-    this.orderButtonCloseElement = ensureElement<HTMLButtonElement>('.order-success__button', this.container);
+    this.orderButtonCloseElement = ensureElement<HTMLButtonElement>('.order-success__close', this.container);
     this.orderTitleElement = ensureElement<HTMLElement>('.order-success__title', this.container);
     this.orderButtonCloseElement.addEventListener('click', () => {
       this.events.emit(eventNames.ORDER_SUCCESS_CLICK_CLOSE);

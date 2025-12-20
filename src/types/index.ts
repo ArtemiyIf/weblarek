@@ -17,6 +17,18 @@ export interface IApi {
   ): Promise<T>;
 }
 
+export interface TOrderForm {
+    payment: string;
+    address: string;
+    error?: string; // Добавляем необязательное поле
+}
+
+export interface TContactsForm {
+    email: string;
+    phone: string;
+    error?: string; // Добавляем необязательное поле
+}
+
 export interface IProduct {
   id: string;
   description: string;

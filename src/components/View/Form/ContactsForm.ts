@@ -1,8 +1,9 @@
 import { Form } from './Form';
 import { IEvents } from '../../base/Events';
+import { TContactsForm } from '../../../types'; 
 
 
-export class ContactsForm extends Form<{ email: string, phone: string }> {
+export class ContactsForm extends Form<ContactsForm> {
     protected emailInput: HTMLInputElement;
     protected phoneInput: HTMLInputElement;
     private events: IEvents;
@@ -36,5 +37,14 @@ export class ContactsForm extends Form<{ email: string, phone: string }> {
         if (!this.emailInput.value) errors.email = 'Email обязателен';
         if (!this.phoneInput.value) errors.phone = 'Телефон обязателен';
         return errors;
+    }
+
+    // Объявляем render, чтобы TypeScript знал про поле `error`
+    render(data: TContactsForm): HTMLElement {
+        // Устанавливаем значения полей
+        this.email = data.email;
+        this.phone = data.phone;
+
+        return this.container;
     }
 }
