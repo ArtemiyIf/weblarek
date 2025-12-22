@@ -47,9 +47,20 @@ export interface IBuyer {
   address: string;
 }
 
+export type IOrder = Omit<IBuyer, "payment"> & {
+  payment: TPayment; 
+  items: string[]; 
+  total: number; 
+}
+
 export interface IGetProductsApiResponse {
   total: number;
   items: IProduct[]; // именно items, а не data!
+}
+
+export type IOrderResult = {
+  id: string; 
+  total: number; 
 }
 
 export interface IOrderApiRequest {
@@ -57,7 +68,7 @@ export interface IOrderApiRequest {
   email: string;
   phone: string;
   address: string;
-  total: number; // в API-ответе поле называется total, а не totalAmount
+  total: number; 
   items: string[]; // массив ID товаров (не {productId, quantity})
 }
 

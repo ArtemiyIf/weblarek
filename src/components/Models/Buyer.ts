@@ -41,7 +41,7 @@ export class Buyer {
         };
     }
 
-    clear(): void {
+   clear(): void {
         this._payment = 'card';
         this._email = '';
         this._phone = '';
@@ -49,11 +49,12 @@ export class Buyer {
         this.events.emit('buyer:cleared');
     }
 
-    checkValidity(): Partial<{ [K in keyof IBuyer]: string }> {
-        const errors: Partial<{ [K in keyof IBuyer]: string }> = {};
-        if (!this._email) errors.email = 'Email обязателен';
-        if (!this._phone) errors.phone = 'Телефон обязателен';
-        if (!this._address) errors.address = 'Адрес обязателен';
-        return errors;
-    }
+    сheckValidity(): Partial<{ [K in keyof IBuyer]: string }> {
+    const errors: Partial<{ [K in keyof IBuyer]: string }> = {};
+    if (!this._payment) errors.payment = 'Выберите способ оплаты'; // Добавлено
+    if (!this._email) errors.email = 'Email обязателен';
+    if (!this._phone) errors.phone = 'Телефон обязателен';
+    if (!this._address) errors.address = 'Адрес обязателен';
+    return errors;
+  }
 }

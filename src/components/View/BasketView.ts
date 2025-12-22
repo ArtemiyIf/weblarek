@@ -13,8 +13,8 @@ export class BasketView extends Component<{ items: HTMLElement[], total: number 
         this.priceElem = container.querySelector('.basket__price')!;
 
         this.buttonOrder.addEventListener('click', () => {
-            events.emit('order:submit');
-        });
+        events.emit('basket:checkout'); 
+     });
     }
 
     set items(items: HTMLElement[]) {

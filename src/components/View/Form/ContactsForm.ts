@@ -1,6 +1,7 @@
 import { Form } from './Form';
 import { IEvents } from '../../base/Events';
 import { TContactsForm } from '../../../types'; 
+import {eventNames} from '../../../utils/constants';
 
 
 export class ContactsForm extends Form<ContactsForm> {
@@ -16,11 +17,11 @@ export class ContactsForm extends Form<ContactsForm> {
 
         // Обработчики для полей ввода
         this.emailInput.addEventListener('input', () => {
-            this.events.emit('form:email:change', { email: this.emailInput.value });
+            this.events.emit(eventNames.CONTACTS_FORM_SET_EMAIL, { email: this.emailInput.value });
         });
 
         this.phoneInput.addEventListener('input', () => {
-            this.events.emit('form:phone:change', { phone: this.phoneInput.value });
+            this.events.emit(eventNames.CONTACTS_FORM_SET_PHONE, { phone: this.phoneInput.value });
         });
     }
 

@@ -31,8 +31,20 @@ export class Modal extends Component<void> {
         this.container.classList.remove('modal_active');
     }
 
+    private currentContent: HTMLElement | null = null;
+    
     setData(content: HTMLElement): void {
         this.contentElem.innerHTML = '';
+        this.currentContent = content;
         this.contentElem.appendChild(content);
     }
+    
+    isOpen(): boolean {
+        return this.container.classList.contains('modal_active');
+    }
+    
+    getCurrentContent(): HTMLElement | null {
+        return this.currentContent;
+    }
+
 }

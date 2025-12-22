@@ -1,48 +1,35 @@
 import { Card } from '../Card/Card';
 import { CDN_URL } from '../../../utils/constants';
-import {IProduct, TCategoryNames } from '../../../types';
+import { IProduct, TCategoryNames } from '../../../types';
 import { ensureElement } from '../../../utils/utils';
 
 type TCardCatalogActions = {
-    onClick?: (id: string) => void;
+    onClick?: (event: MouseEvent) => void;
 };
 
-type TCardCatalog = Pick<IProduct, 'image' | 'category'>;
-
-export class CardCatalog extends Card<TCardCatalog> {
+export class CardCatalog extends Card<IProduct> {
     protected categoryElem: HTMLElement;
     protected imageElem: HTMLImageElement;
 
-    constructor(
-        container: HTMLElement,
-        protected actions?: TCardCatalogActions
-    ) {
+    constructor(container: HTMLElement, actions?: TCardCatalogActions) {
         super(container);
+        
+        this.categoryElem = ensureElement<HTMLElement>('.card__category', this.container);
+        this.imageElem = ensureElement<HTMLImageElement>('.card__image', this.container);
 
-        this.categoryElem = ensureElement<HTMLElement>(
-            '.card__category',
-            this.container
-        );
-        this.imageElem = ensureElement<HTMLImageElement>(
-            '.card__image',
-            this.container
-        );
-
-        // Обработчик клика — передаём id товара
-        this.container.addEventListener('click', () => {
-            if (this.actions?.onClick) {
-                this.actions.onClick(this.getId());
-            }
-        });
+        if (actions?.onClick) {
+            this.container.addEventListener('click', actions.onClick);
+        }
     }
 
-    set category(category: TCategoryNames) {
-        const modifier = Card.getCategoryClassByCategoryName(category);
-        this.categoryElem.textContent = category;
-        this.categoryElem.className = `card_category ${modifier}`;
+    set category(value: TCategoryNames) {
+        const modifier = Card.getCategoryClassByCategoryName(value);
+        this.categoryElem.textContent = value;
+        this.categoryElem.className = `card__category ${modifier}`; 
     }
 
-    set image(imageSrc: string) {
-        this.setImage(this.imageElem, `${CDN_URL}${imageSrc}`);
-    }
+    set image(value: string) {
+    console.log('Setting image:', `${CDN_URL}${value}`); // Для отладки
+    this.setImage(this.imageElem, `${CDN_URL}${value}`);
+}
 }

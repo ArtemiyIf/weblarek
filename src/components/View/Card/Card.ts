@@ -27,12 +27,12 @@ export abstract class Card<T> extends Component<TCardData & T> {
     }
 
     set price(value: number | null) {
-        if (value === null) {
-            this.priceElem.textContent = 'Бесценно';
-        } else {
-            this.priceElem.textContent = `${value.toFixed(2)} ₽`;
-        }
+    if (value === null) {
+        this.priceElem.textContent = 'Бесценно';
+    } else {
+        this.priceElem.textContent = `${value} синапсов`; // Исправлено
     }
+}
 
      static getCategoryClassByCategoryName(categoryName: TCategoryNames): string {
         return categoryMap[categoryName];

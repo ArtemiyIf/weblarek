@@ -14,14 +14,48 @@ export class ProductApi {
   }
 
   async getProducts(): Promise<IGetProductsApiResponse> {
-    try {
-      return await this.api.get<IGetProductsApiResponse>('/product/');
-    } catch (error) {
-      // Корректная обработка ошибки без возврата данных
-      console.error('Ошибка при получении продуктов:', error);
-      throw error; // Перебрасываем ошибку дальше
-    }
-  }
+    const mockItems = [
+        {
+            id: '1',
+            title: 'Фреймворк куки судьбы',
+            price: 2500,
+            category: 'софт-скил',
+            image: './src/images/Subtract.svg',
+            description: 'Фреймворк для работы с куками'
+        },
+        {
+            id: '2',
+            title: 'Бэкенд-антистресс',
+            price: 1000,
+            category: 'другое',
+            image: './src/images/Subtract.svg',
+            description: 'Если планируете решать задачи в тренажёре, берите два.'
+        },
+        {
+            id: '3',
+            title: '+1 час в сутках',
+            price: 750,
+            category: 'софт-скил',
+            image: './src/images/Subtract.svg',
+            description: 'Дополнительный час в сутках'
+        }
+    ];
+    
+    return {
+        items: mockItems,
+        total: mockItems.reduce((sum, item) => sum + item.price, 0) // сумма всех цен
+    };
+}
+
+  // async getProducts(): Promise<IGetProductsApiResponse> {
+  //   try {
+  //     return await this.api.get<IGetProductsApiResponse>('/product/');
+  //   } catch (error) {
+  //     // Корректная обработка ошибки без возврата данных
+  //     console.error('Ошибка при получении продуктов:', error);
+  //     throw error; // Перебрасываем ошибку дальше
+  //   }
+  // }
 
   async order(
     data: IOrderApiRequest
@@ -49,4 +83,7 @@ export class ProductApi {
       };
     }
   }
+
+
+  
 }
