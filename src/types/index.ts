@@ -82,3 +82,4 @@ export interface IApiError {
 }
 
 export type TCategoryNames = keyof typeof categoryMap;
+

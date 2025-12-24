@@ -49,12 +49,33 @@ export class Buyer {
         this.events.emit('buyer:cleared');
     }
 
-    сheckValidity(): Partial<{ [K in keyof IBuyer]: string }> {
+    checkValidity(): Partial<{ [K in keyof IBuyer]: string }> {
     const errors: Partial<{ [K in keyof IBuyer]: string }> = {};
-    if (!this._payment) errors.payment = 'Выберите способ оплаты'; // Добавлено
-    if (!this._email) errors.email = 'Email обязателен';
-    if (!this._phone) errors.phone = 'Телефон обязателен';
-    if (!this._address) errors.address = 'Адрес обязателен';
-    return errors;
+    console.log('Проверка валидности Buyer:', {
+            payment: this._payment,
+            address: this._address,
+            email: this._email,
+            phone: this._phone
+        });
+        
+        if (!this._payment) {
+            errors.payment = 'Выберите способ оплаты';
+            console.log('❌ Ошибка: способ оплаты не выбран');
+        }
+        
+        if (!this._address.trim()) {
+            errors.address = 'Адрес обязателен';
+            console.log('❌ Ошибка: адрес не заполнен');
+        }
+        
+        if (!this._email.trim()) {
+            errors.email = 'Email обязателен';
+        }
+        
+        if (!this._phone.trim()) {
+            errors.phone = 'Телефон обязателен';
+        }
+        
+        return errors;
   }
 }

@@ -123,7 +123,7 @@ function renderPreview(item: IProduct): HTMLElement {
 
 function renderOrderForm(): HTMLElement {
     const { payment, address } = buyerModel.getData();
-    const errors = buyerModel.сheckValidity();
+    const errors = buyerModel.checkValidity();
     const error = errors.payment || errors.address || '';
     
     return orderFormView.render({ payment, address, error });
@@ -131,7 +131,7 @@ function renderOrderForm(): HTMLElement {
 
 function renderContactsForm(): HTMLElement {
     const { email, phone } = buyerModel.getData();
-    const errors = buyerModel.сheckValidity();
+    const errors = buyerModel.checkValidity();
     const error = errors.email || errors.phone || '';
     
     return contactsFormView.render({ email, phone, error });
@@ -221,7 +221,7 @@ eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
     console.log('Переходим к форме контактов');
     
     // Проверяем валидность формы заказа
-    const errors = buyerModel.сheckValidity();
+    const errors = buyerModel.checkValidity();
     if (errors.payment || errors.address) {
         console.log('Ошибки в форме заказа:', errors);
         modalView.setData(renderOrderForm());
@@ -234,7 +234,7 @@ eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
 eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
     console.log('Форма заказа отправлена');
     // Проверяем валидность
-    const errors = buyerModel.сheckValidity();
+    const errors = buyerModel.checkValidity();
     if (errors.payment || errors.address) {
         console.log('Ошибки в форме заказа:', errors);
         // Показываем ошибки
@@ -284,7 +284,7 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
     console.log('Отправляем заказ...');
     
     // Проверяем валидность формы контактов
-    const errors = buyerModel.сheckValidity();
+    const errors = buyerModel.checkValidity();
     if (errors.email || errors.phone) {
         console.log('Ошибки в форме контактов:', errors);
         modalView.setData(renderContactsForm());
@@ -359,7 +359,8 @@ async function initApp() {
     try {
         // Загружаем товары
         const response = await productApi.getProducts();
-        console.log('Загружено товаров:', response.items.length);
+        console.log('Загружено товаров с API:', response.items.length);
+        console.log('Первый товар:', response.items[0]);
         
         // Устанавливаем в модель
         catalogModel.setItems(response.items);

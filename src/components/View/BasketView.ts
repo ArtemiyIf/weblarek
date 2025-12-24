@@ -1,5 +1,6 @@
 import { Component } from '../base/Component';
 import { IEvents } from '../base/Events';
+import { eventNames } from '../../utils/constants';
 
 export class BasketView extends Component<{ items: HTMLElement[], total: number }> {
     protected listElem: HTMLElement;
@@ -13,7 +14,7 @@ export class BasketView extends Component<{ items: HTMLElement[], total: number 
         this.priceElem = container.querySelector('.basket__price')!;
 
         this.buttonOrder.addEventListener('click', () => {
-        events.emit('basket:checkout'); 
+        events.emit(eventNames.BASKET_CHECKOUT); 
      });
     }
 
