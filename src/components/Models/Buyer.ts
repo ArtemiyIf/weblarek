@@ -1,5 +1,6 @@
 import { IBuyer, TPayment } from '../../types';
 import { EventEmitter } from '../base/Events';
+import { eventNames } from '../../utils/constants';
 
 export class Buyer {
     private _payment: TPayment = 'card';
@@ -14,22 +15,22 @@ export class Buyer {
 
     setPayment(payment: TPayment): void {
         this._payment = payment;
-        this.events.emit('buyer:setPayment');
+        this.events.emit(eventNames.CUSTOMER_SET_PAYMENT);
     }
 
     setEmail(email: string): void {
         this._email = email;
-        this.events.emit('buyer:setEmail');
+        this.events.emit(eventNames.CUSTOMER_SET_EMAIL);
     }
 
     setPhone(phone: string): void {
         this._phone = phone;
-        this.events.emit('buyer:setPhone');
+        this.events.emit(eventNames.CUSTOMER_SET_PHONE);
     }
 
     setAddress(address: string): void {
         this._address = address;
-        this.events.emit('buyer:setAddress');
+        this.events.emit(eventNames.CUSTOMER_SET_ADDRESS);
     }
 
     getData(): IBuyer {
@@ -46,7 +47,6 @@ export class Buyer {
         this._email = '';
         this._phone = '';
         this._address = '';
-        this.events.emit('buyer:cleared');
     }
 
     checkValidity(): Partial<{ [K in keyof IBuyer]: string }> {

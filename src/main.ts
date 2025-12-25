@@ -166,12 +166,6 @@ eventEmitter.on(eventNames.BASKET_OPEN, () => {
     modalView.open();
 });
 
-// 5. Обновление корзины при изменениях
-eventEmitter.on(eventNames.BASKET_CHANGED, () => {
-    console.log('Корзина изменилась');
-    renderHeader();
-});
-
 // 6. Удаление товара из корзины
 eventEmitter.on<IProduct>(eventNames.CARD_BASKET_DELETE_ITEM, (item) => {
     console.log('Удаляем товар из корзины:', item.title);
@@ -217,20 +211,6 @@ eventEmitter.on(eventNames.CUSTOMER_SET_ADDRESS, () => {
 });
 
 // 11. Переход к форме контактов
-eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
-    console.log('Переходим к форме контактов');
-    
-    // Проверяем валидность формы заказа
-    const errors = buyerModel.checkValidity();
-    if (errors.payment || errors.address) {
-        console.log('Ошибки в форме заказа:', errors);
-        modalView.setData(renderOrderForm());
-        return;
-    }
-    
-    modalView.setData(renderContactsForm());
-});
-
 eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
     console.log('Форма заказа отправлена');
     // Проверяем валидность
@@ -320,6 +300,8 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
             // Очищаем корзину и данные покупателя
             basketModel.clear();
             buyerModel.clear();
+
+            renderHeader();
             
             // Показываем окно успеха
             modalView.setData(successView.render({ total: response.total }));
@@ -329,6 +311,11 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
     } catch (error) {
         console.error('Ошибка при отправке заказа:', error);
     }
+});
+
+eventEmitter.on(eventNames.BASKET_CLEAR, () => {
+    console.log('Корзина очищена, обновляем шапку');
+    renderHeader();
 });
 
 // 17. Дополнительные обработчики для обновления UI
