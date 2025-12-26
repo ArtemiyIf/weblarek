@@ -16,6 +16,7 @@ export class CardPreview extends Card<TCardPreviewData> {
     protected readonly buttonElement: HTMLButtonElement;
     protected readonly categoryElem: HTMLElement;
     protected readonly imageElem: HTMLImageElement;
+    private onClickHandler: (() => void) | null = null; // ДОБАВЛЕНО
 
     constructor(
         protected readonly container: HTMLElement,
@@ -28,9 +29,21 @@ export class CardPreview extends Card<TCardPreviewData> {
         this.categoryElem = ensureElement<HTMLElement>('.card__category', this.container);
         this.imageElem = ensureElement<HTMLImageElement>('.card__image', this.container);
 
-        if (this.actions?.onClick) {
-            this.buttonElement.addEventListener('click', this.actions.onClick);
+        // ИСПРАВЛЕНО: Используем локальный обработчик
+        this.buttonElement.addEventListener('click', () => {
+            if (this.onClickHandler) {
+                this.onClickHandler();
+            }
+        });
+
+         if (this.actions?.onClick) {
+            this.onClickHandler = this.actions.onClick;
         }
+    }
+
+    //  ДОБАВЛЕНО: Метод для обновления обработчика
+    setOnClick(handler: () => void): void {
+        this.onClickHandler = handler;
     }
 
     set category(category: TCategoryNames) {

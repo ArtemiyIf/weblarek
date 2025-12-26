@@ -1,9 +1,9 @@
-import { IProduct } from '../../types';
 import { EventEmitter } from '../base/Events';
-import { eventNames } from '../../utils/constants';
+import { IProduct } from '../../types';
 
 export class Basket {
-    private _items: IProduct[] = [];
+    private items: IProduct[] = [];
+    private total: number = 0;
     private events: EventEmitter;
 
     constructor(events: EventEmitter) {
@@ -11,46 +11,44 @@ export class Basket {
     }
 
     getItems(): IProduct[] {
-        return this._items;
-    }
-
-    addItem(item: IProduct): void {
-        if (!this.hasItem(item.id)) {
-            this._items.push(item);
-            this.events.emit(eventNames.BASKET_ADD_ITEM, { item });
-        }
-    }
-
-    removeItem(id: string): void {
-        const removedItem = this._items.find(item => item.id === id);
-        this._items = this._items.filter(item => item.id !== id);
-        
-        // 🔧 Передаём объект с id или удалённым товаром
-        if (removedItem) {
-            this.events.emit(eventNames.BASKET_DELETE_ITEM, { 
-                id, 
-                item: removedItem 
-            });
-        } else {
-            this.events.emit(eventNames.BASKET_DELETE_ITEM, { id });
-        }
-    }
-
-    clear(): void {
-        const items = [...this._items];
-        this._items = [];
-        this.events.emit(eventNames.BASKET_CLEAR, { items });
+        return [...this.items];
     }
 
     getTotalPrice(): number {
-        return this._items.reduce((sum, item) => sum + (item.price || 0), 0);
+        return this.total;
     }
 
     getTotalItems(): number {
-        return this._items.length;
+        return this.items.length;
     }
 
     hasItem(id: string): boolean {
-        return this._items.some(item => item.id === id);
+        return this.items.some(item => item.id === id);
+    }
+
+    addItem(item: IProduct): void {
+        this.items.push(item);
+        this.updateTotal();
+        this.events.emit('basket:change');
+    }
+
+    removeItem(id: string): void {
+        this.items = this.items.filter(item => item.id !== id);
+        this.updateTotal();
+        this.events.emit('basket:change');
+    }
+
+    clear(): void {
+        this.items = [];
+        this.total = 0;
+        this.events.emit('basket:change');
+    }
+
+    private updateTotal(): void {
+        this.total = this.calculateTotal();
+    }
+
+    private calculateTotal(): number {
+        return this.items.reduce((sum, item) => sum + (item.price || 0), 0);
     }
 }
