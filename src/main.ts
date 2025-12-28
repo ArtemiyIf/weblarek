@@ -49,7 +49,7 @@ const buyerModel = new Buyer(eventEmitter);
 // DOM-элементы
 const headerElem = ensureElement<HTMLElement>('.header');
 const galleryElem = ensureElement<HTMLElement>('.gallery');
-const modalElem = ensureElement<HTMLElement>('#modal-container'); // ← ЭТО НЕ template, а обычный div
+const modalElem = ensureElement<HTMLElement>('#modal-container');
 
 // Шаблоны
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
@@ -69,8 +69,7 @@ const orderFormView = new OrderForm(cloneTemplate<HTMLFormElement>(orderFormTemp
 const contactsFormView = new ContactsForm(cloneTemplate<HTMLFormElement>(contactsFormTemplate), eventEmitter);
 const successView = new Success(eventEmitter, cloneTemplate<HTMLElement>(successTemplate));
 const cardPreview = new CardPreview(cloneTemplate(cardPreviewTemplate), {
-    onClick: () => {} // Пустой обработчик, будет перезаписан
-    // Оставляем пустой обработчик, так как в конструкторе CardPreview ожидается параметр actions 
+    onClick: () => {}
 });
 
 
@@ -86,9 +85,7 @@ function renderBasket(): HTMLElement {
         const card = new CardBasket(cloneTemplate(cardBasketTemplate), {
             onClick: () => {
                 console.log('Клик по удалению товара:', item.title);
-                basketModel.removeItem(item.id); // ← Прямой вызов модели
-                // Модель сама вызовет событие BASKET_DELETE_ITEM
-                // которое обновит UI через функцию updateBasketUI()
+                basketModel.removeItem(item.id);
             }
         });
         return card.render({ ...item, index: index + 1 });
@@ -98,10 +95,13 @@ function renderBasket(): HTMLElement {
     
     console.log('Рендерим корзину:', items.length, 'товаров, сумма:', total);
     
-    return basketView.render({ 
+    const basketElement = basketView.render({ 
         items, 
-        total 
+        total  
     });
+    basketView.setButtonState(total === 0);
+    
+    return basketElement;
 }
 
 function renderCatalog(items: IProduct[]): void {
@@ -121,7 +121,6 @@ function renderCatalog(items: IProduct[]): void {
 function renderPreview(item: IProduct): HTMLElement {
     console.log('Рендерим превью товара:', item.title);
     
-    // ИСПРАВЛЕНО: Обновляем обработчик для текущего товара
     cardPreview.setOnClick(() => {
         if (basketModel.hasItem(item.id)) {
             basketModel.removeItem(item.id);
@@ -133,30 +132,11 @@ function renderPreview(item: IProduct): HTMLElement {
         modalView.close();
     });
     
-    // Возвращаем обновленную карточку
     return cardPreview.render({
         ...item,
         canBuy: item.price !== null,
         buttonText: basketModel.hasItem(item.id) ? 'Удалить из корзины' : 'В корзину'
     });
-}
-
-function renderOrderForm(): HTMLElement {
-    const { payment, address } = buyerModel.getData();
-    const errors = buyerModel.checkValidity();
-    const error = errors.payment || errors.address || '';
-    
-    console.log('Рендерим форму заказа:', { payment, address, error });
-    return orderFormView.render({ payment, address, error });
-}
-
-function renderContactsForm(): HTMLElement {
-    const { email, phone } = buyerModel.getData();
-    const errors = buyerModel.checkValidity();
-    const error = errors.email || errors.phone || '';
-    
-    console.log('Рендерим форму контактов:', { email, phone, error });
-    return contactsFormView.render({ email, phone, error });
 }
 
 
@@ -169,7 +149,7 @@ eventEmitter.on(eventNames.CATALOG_SET_ITEMS, (items: IProduct[]) => {
 });
 
 // 2. Выбор товара из каталога
-eventEmitter.on<IProduct>(eventNames.CARD_CATALOG_SELECTED, (item) => {
+eventEmitter.on(eventNames.CARD_CATALOG_SELECTED, (item: IProduct) => {
     console.log('Выбран товар:', item.title);
     catalogModel.setCurrentItem(item);
 });
@@ -181,147 +161,124 @@ eventEmitter.on(eventNames.CATALOG_SET_CURRENT_ITEM, (item: IProduct) => {
     modalView.open();
 });
 
-// 4. Открытие корзины
+// 4. Открытие корзины - ИСПРАВЛЕНО (замечание 1-2)
 eventEmitter.on(eventNames.BASKET_OPEN, () => {
     console.log('Открываем корзину');
-    const basketContent = renderBasket();
+    const basketContent = basketView.render({
+        items: basketModel.getItems().map((item, index) => {
+            const card = new CardBasket(cloneTemplate(cardBasketTemplate), {
+                onClick: () => {
+                    console.log('Клик по удалению товара:', item.title);
+                    basketModel.removeItem(item.id);
+                }
+            });
+            return card.render({ ...item, index: index + 1 });
+        }),
+        total: basketModel.getTotalPrice()
+    });
+    
     modalView.setData(basketContent);
     modalView.open();
 });
 
-// 5. Обновление UI при изменениях в корзине (одно событие)
+
+// 5. Обновление UI при изменениях в корзине
 eventEmitter.on('basket:change', () => {
     console.log('Корзина изменилась, обновляем UI');
     updateBasketUI();
 });
 
-// Вспомогательная функция для обновления UI корзины
+// Вспомогательная функция для обновления UI корзины - ИСПРАВЛЕНО
 function updateBasketUI(): void {
     // Обновляем шапку
     renderHeader();
     
-    // Если корзина открыта в модальном окне - обновляем её содержимое
-    if (modalView.isOpen() && isBasketOpen()) {
-        console.log('Корзина открыта, обновляем содержимое');
-        const updatedBasket = renderBasket();
-        modalView.setData(updatedBasket);
-    }
+    // Обновляем список покупок В ЛЮБОМ СЛУЧАЕ (замечание 3-4)
+    console.log('Обновляем список покупок');
+    renderBasket();
 }
-
-// Проверяем, открыта ли сейчас корзина
-function isBasketOpen(): boolean {
-    const currentContent = modalView.getCurrentContent();
-    return currentContent ? currentContent.classList.contains('basket') : false;
-}
-
 
 // 6. Переход к оформлению заказа
 eventEmitter.on(eventNames.BASKET_CHECKOUT, () => {
     console.log('Переходим к оформлению заказа');
-    modalView.setData(renderOrderForm());
+    // 🔧 ИСПРАВЛЕНИЕ: Вызываем render() без аргументов
+    const orderFormContent = orderFormView.render();
+    modalView.setData(orderFormContent);
     modalView.open();
 });
 
 // 7. Установка способа оплаты
-eventEmitter.on<Pick<IBuyer, 'payment'>>(eventNames.ORDER_FORM_SET_PAYMENT, ({ payment }) => {
-    console.log('Установлен способ оплаты:', payment);
-    buyerModel.setPayment(payment);
+eventEmitter.on(eventNames.ORDER_FORM_SET_PAYMENT, (data: { payment: string }) => {
+    console.log('Установлен способ оплаты:', data.payment);
+    eventEmitter.emit('buyer:change', { key: 'payment', value: data.payment });
 });
 
 // 8. Установка адреса доставки
-eventEmitter.on<Pick<IBuyer, 'address'>>(eventNames.ORDER_FORM_SET_ADDRESS, ({ address }) => {
-    console.log('Установлен адрес:', address);
-    buyerModel.setAddress(address);
+eventEmitter.on(eventNames.ORDER_FORM_SET_ADDRESS, (data: { address: string }) => {
+    console.log('Установлен адрес:', data.address);
+    eventEmitter.emit('buyer:change', { key: 'address', value: data.address });
 });
 
-// 9 ДОБАВЬТЕ ЗДЕСЬ: Обработчик изменения валидации
-eventEmitter.on('buyer:validationChanged', (errors: Partial<{ [K in keyof IBuyer]: string }>) => {
-    console.log('Валидация изменилась:', errors);
-    
-    // Если открыта форма заказа - обновляем её
-    if (modalView.isOpen() && modalView.getCurrentContent()?.querySelector('form[name="order"]')) {
-        console.log('Обновляем форму заказа с новыми ошибками валидации');
-        modalView.setData(renderOrderForm());
-    }
-    
-    // Если открыта форма контактов - обновляем её
-    if (modalView.isOpen() && modalView.getCurrentContent()?.querySelector('form[name="contacts"]')) {
-        console.log('Обновляем форму контактов с новыми ошибками валидации');
-        modalView.setData(renderContactsForm());
-    }
+// 9. Установка email
+eventEmitter.on(eventNames.CONTACTS_FORM_SET_EMAIL, (data: { email: string }) => {
+    console.log('Установлен email:', data.email);
+    eventEmitter.emit('buyer:change', { key: 'email', value: data.email });
 });
 
-// 10. Обновление формы заказа при изменении данных
-eventEmitter.on(eventNames.CUSTOMER_SET_PAYMENT, () => {
-    console.log('Обновляем форму заказа (изменён способ оплаты)');
-    // Проверяем валидность формы заказа
+// 10. Установка телефона
+eventEmitter.on(eventNames.CONTACTS_FORM_SET_PHONE, (data: { phone: string }) => {
+    console.log('Установлен телефон:', data.phone);
+    eventEmitter.emit('buyer:change', { key: 'phone', value: data.phone });
+});
+
+// 11. Обработчик обновления данных модели
+eventEmitter.on('buyer:change', (data: { key: keyof IBuyer, value: any }) => {
+    console.log(`Изменение покупателя: ${data.key} = ${data.value}`);
+    buyerModel.setData(data.key, data.value);
+});
+
+// 12. Обработчик обновления форм (архитектура из замечания ревьюера)
+eventEmitter.on('forms:change', () => {
+    console.log('Обновление форм после изменения модели покупателя');
+    
+    const buyer = buyerModel.getData();
     const errors = buyerModel.checkValidity();
-    if (errors.payment || errors.address) {
-        console.log('Ошибки в форме заказа:', errors);
-        modalView.setData(renderOrderForm());
-        return;
-    }
     
-    modalView.setData(renderContactsForm());
+    // Обновляем форму заказа
+    orderFormView.payment = buyer.payment;
+    orderFormView.address = buyer.address;
+    orderFormView.setErrors(errors.payment, errors.address);
+    orderFormView.setValid(!errors.payment && !errors.address);
+    
+    // Обновляем форму контактов
+    contactsFormView.email = buyer.email;
+    contactsFormView.phone = buyer.phone;
+    contactsFormView.setErrors(errors.email, errors.phone);
+    contactsFormView.setValid(!errors.email && !errors.phone);
 });
 
-eventEmitter.on(eventNames.CUSTOMER_SET_ADDRESS, () => {
-    console.log('Обновляем форму заказа (изменён адрес)');
-    if (modalView.isOpen()) {
-        modalView.setData(renderOrderForm());
-    }
-});
-
-// 11. Переход к форме контактов
+// 13. Переход к форме контактов
 eventEmitter.on(eventNames.ORDER_FORM_SUBMIT, () => {
     console.log('Форма заказа отправлена');
-    // Проверяем валидность
+    
     const errors = buyerModel.checkValidity();
     if (errors.payment || errors.address) {
         console.log('Ошибки в форме заказа:', errors);
-        // Показываем ошибки
-        modalView.setData(renderOrderForm());
         return;
     }
     
-    // Переходим к форме контактов
-    modalView.setData(renderContactsForm());
+    // 🔧 ИСПРАВЛЕНИЕ: Вызываем render() без аргументов
+    const contactsFormContent = contactsFormView.render();
+    modalView.setData(contactsFormContent);
 });
 
-// 12. Установка email
-eventEmitter.on<Pick<IBuyer, 'email'>>(eventNames.CONTACTS_FORM_SET_EMAIL, ({ email }) => {
-    console.log('Установлен email:', email);
-    buyerModel.setEmail(email);
-});
-
-// 13. Установка телефона
-eventEmitter.on<Pick<IBuyer, 'phone'>>(eventNames.CONTACTS_FORM_SET_PHONE, ({ phone }) => {
-    console.log('Установлен телефон:', phone);
-    buyerModel.setPhone(phone);
-});
-
-// 14. Обновление формы контактов при изменении данных
-eventEmitter.on(eventNames.CUSTOMER_SET_EMAIL, () => {
-    console.log('Обновляем форму контактов (изменён email)');
-    if (modalView.isOpen()) {
-        modalView.setData(renderContactsForm());
-    }
-});
-
-eventEmitter.on(eventNames.CUSTOMER_SET_PHONE, () => {
-    console.log('Обновляем форму контактов (изменён телефон)');
-    if (modalView.isOpen()) {
-        modalView.setData(renderContactsForm());
-    }
-});
-
-// 15. Закрытие окна успеха
+// 14. Закрытие окна успеха
 eventEmitter.on(eventNames.ORDER_SUCCESS_CLICK_CLOSE, () => {
     console.log('Закрываем окно успеха');
     modalView.close();
 });
 
-// 16. Отправка заказа
+// 15. Отправка заказа
 eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
     console.log('Отправляем заказ...');
     
@@ -329,7 +286,6 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
     const errors = buyerModel.checkValidity();
     if (errors.email || errors.phone) {
         console.log('Ошибки в форме контактов:', errors);
-        modalView.setData(renderContactsForm());
         return;
     }
     
@@ -365,7 +321,7 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
             modalView.setData(successView.render({ total: response.total }));
             modalView.open();
         } else {
-            // ОШИБКА ОТ СЕРВЕРА (хотя по Postman не должно быть)
+            // ОШИБКА ОТ СЕРВЕРА
             console.error('Ошибка при оформлении заказа:', response);
         }
         
@@ -375,14 +331,12 @@ eventEmitter.on(eventNames.CONTACTS_FORM_SUBMIT, async () => {
     }
 });
 
-
 // Обработка закрытия модального окна
 eventEmitter.on('modal:close', () => {
     modalView.close();
 });
 
 // --- Инициализация приложения ---
-
 async function initApp() {
     console.log('Запуск приложения...');
     
@@ -390,7 +344,6 @@ async function initApp() {
         // Загружаем товары
         const response = await productApi.getProducts();
         console.log('Загружено товаров с API:', response.items.length);
-        console.log('Первый товар:', response.items[0]);
         
         // Устанавливаем в модель
         catalogModel.setItems(response.items);
@@ -405,5 +358,3 @@ async function initApp() {
 
 // Запускаем приложение
 initApp();
-
-

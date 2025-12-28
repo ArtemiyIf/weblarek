@@ -45,7 +45,7 @@ export class OrderForm extends Form<TOrderForm> {
             e.preventDefault();
             console.log('Форма заказа отправлена');
             
-            // ДОБАВЛЕНО: Проверяем, выбрана ли оплата перед отправкой
+            // Проверяем, выбрана ли оплата перед отправкой
             const selectedPayment = this.getSelectedPayment();
             if (!selectedPayment) {
                 console.warn('Способ оплаты не выбран!');
@@ -56,7 +56,7 @@ export class OrderForm extends Form<TOrderForm> {
         });
     }
 
-    // ДОБАВЛЕНО: Метод для получения выбранного способа оплаты
+    // Метод для получения выбранного способа оплаты
     private getSelectedPayment(): TPayment | null {
         const activeButton = this.paymentBtns.find(btn => 
             btn.classList.contains('button_alt-active')
@@ -77,21 +77,37 @@ export class OrderForm extends Form<TOrderForm> {
         this.addressInput.value = value;
     }
 
-    render(data: TOrderForm): HTMLElement {
-        this.payment = data.payment;
-        this.address = data.address;
-        
-        // ИСПРАВЛЕНО: Отображаем ошибки из модели
-        if (data.error) {
-            this.errors = [data.error];
-            // ДОБАВЛЕНО: Делаем кнопку неактивной при ошибке
-            this.submitBtnElem.disabled = true;
-        } else {
-            this.clearErrors();
-            //  ДОБАВЛЕНО: Делаем кнопку активной если ошибок нет
-            this.submitBtnElem.disabled = false;
+    // 🔧 ИСПРАВЛЕНИЕ 15: Метод для установки ошибок валидации
+    setErrors(paymentError?: string, addressError?: string): void {
+        const errors: string[] = [];
+        if (paymentError) errors.push(paymentError);
+        if (addressError) errors.push(addressError);
+        this.errors = errors;
+    }
+
+    // 🔧 ИСПРАВЛЕНИЕ 16: Метод для управления доступностью кнопки
+    setValid(isValid: boolean): void {
+        this.submitBtnElem.disabled = !isValid;
+    }
+
+    // 🔧 ИСПРАВЛЕНИЕ: Обновленный метод render
+    render(data?: TOrderForm): HTMLElement {
+        // Если переданы данные - обновляем форму
+        if (data) {
+            this.payment = data.payment;
+            this.address = data.address;
+            
+            // Отображаем ошибки из модели
+            if (data.error) {
+                this.errors = [data.error];
+                this.submitBtnElem.disabled = true;
+            } else {
+                this.clearErrors();
+                this.submitBtnElem.disabled = false;
+            }
         }
         
+        // Всегда возвращаем контейнер (даже если данных нет)
         return this.container;
     }
 }

@@ -13,32 +13,45 @@ export class Buyer {
         this.events = events;
     }
 
+     //  ИСПРАВЛЕНИЕ 7: Единый метод для установки данных
+    setData(key: keyof IBuyer, value: any): void {
+        switch (key) {
+            case 'payment':
+                this._payment = value;
+                this.events.emit(eventNames.CUSTOMER_SET_PAYMENT);
+                break;
+            case 'email':
+                this._email = value;
+                this.events.emit(eventNames.CUSTOMER_SET_EMAIL);
+                break;
+            case 'phone':
+                this._phone = value;
+                this.events.emit(eventNames.CUSTOMER_SET_PHONE);
+                break;
+            case 'address':
+                this._address = value;
+                this.events.emit(eventNames.CUSTOMER_SET_ADDRESS);
+                break;
+        }
+        //  ИСПРАВЛЕНИЕ 8: Генерируем событие forms:change после изменения данных
+        this.events.emit('forms:change');
+    }
+
+     //  ИСПРАВЛЕНИЕ 9: Добавляем вспомогательные методы для обратной совместимости
     setPayment(payment: TPayment): void {
-        this._payment = payment;
-        this.events.emit(eventNames.CUSTOMER_SET_PAYMENT);
-        // 🔧 ДОБАВЛЕНО: Сообщаем о изменении валидации
-        this.events.emit('buyer:validationChanged', this.checkValidity());
+        this.setData('payment', payment);
     }
 
     setEmail(email: string): void {
-        this._email = email;
-        this.events.emit(eventNames.CUSTOMER_SET_EMAIL);
-        // 🔧 ДОБАВЛЕНО: Сообщаем о изменении валидации
-        this.events.emit('buyer:validationChanged', this.checkValidity());
+        this.setData('email', email);
     }
 
     setPhone(phone: string): void {
-        this._phone = phone;
-        this.events.emit(eventNames.CUSTOMER_SET_PHONE);
-        // 🔧 ДОБАВЛЕНО: Сообщаем о изменении валидации
-        this.events.emit('buyer:validationChanged', this.checkValidity());
+        this.setData('phone', phone);
     }
 
     setAddress(address: string): void {
-        this._address = address;
-        this.events.emit(eventNames.CUSTOMER_SET_ADDRESS);
-        // 🔧 ДОБАВЛЕНО: Сообщаем о изменении валидации
-        this.events.emit('buyer:validationChanged', this.checkValidity());
+        this.setData('address', address);
     }
 
     getData(): IBuyer {
@@ -55,9 +68,8 @@ export class Buyer {
         this._email = '';
         this._phone = '';
         this._address = '';
-        this.events.emit('buyer:cleared');
-        // 🔧 ДОБАВЛЕНО: Сообщаем о изменении валидации
-        this.events.emit('buyer:validationChanged', this.checkValidity());
+        //  ИСПРАВЛЕНИЕ 10: Генерируем событие forms:change после очистки
+        this.events.emit('forms:change');
     }
 
     checkValidity(): Partial<{ [K in keyof IBuyer]: string }> {
@@ -70,19 +82,19 @@ export class Buyer {
             phone: this._phone
         });
         
-        // 🔧 УЛУЧШЕНО: Более строгая валидация способа оплаты
+        //  УЛУЧШЕНО: Более строгая валидация способа оплаты
         if (!this._payment || (this._payment !== 'card' && this._payment !== 'cash')) {
             errors.payment = 'Выберите способ оплаты';
             console.log(' Ошибка: способ оплаты не выбран или некорректен');
         }
         
-        // 🔧 УЛУЧШЕНО: Проверка на пустую строку и пробелы
+        //  УЛУЧШЕНО: Проверка на пустую строку и пробелы
         if (!this._address || this._address.trim().length === 0) {
             errors.address = 'Адрес обязателен';
             console.log(' Ошибка: адрес не заполнен');
         }
         
-        // 🔧 УЛУЧШЕНО: Базовая валидация email
+        //  УЛУЧШЕНО: Базовая валидация email
         if (!this._email || this._email.trim().length === 0) {
             errors.email = 'Email обязателен';
             console.log(' Ошибка: email не заполнен');
@@ -91,7 +103,7 @@ export class Buyer {
             console.log(' Ошибка: некорректный формат email');
         }
         
-        // 🔧 УЛУЧШЕНО: Базовая валидация телефона
+        //  УЛУЧШЕНО: Базовая валидация телефона
         if (!this._phone || this._phone.trim().length === 0) {
             errors.phone = 'Телефон обязателен';
             console.log(' Ошибка: телефон не заполнен');
@@ -103,28 +115,5 @@ export class Buyer {
         console.log('Результат валидации:', errors);
         return errors;
     }
-    
-    // 🔧 ДОБАВЛЕНО: Проверка валидности формы заказа (оплата + адрес)
-    isOrderFormValid(): boolean {
-        const errors = this.checkValidity();
-        return !errors.payment && !errors.address;
-    }
-    
-    // 🔧 ДОБАВЛЕНО: Проверка валидности формы контактов (email + телефон)
-    isContactsFormValid(): boolean {
-        const errors = this.checkValidity();
-        return !errors.email && !errors.phone;
-    }
-    
-    // 🔧 ДОБАВЛЕНО: Получить ошибки для формы заказа
-    getOrderFormErrors(): string {
-        const errors = this.checkValidity();
-        return errors.payment || errors.address || '';
-    }
-    
-    // 🔧 ДОБАВЛЕНО: Получить ошибки для формы контактов
-    getContactsFormErrors(): string {
-        const errors = this.checkValidity();
-        return errors.email || errors.phone || '';
-    }
+   
 }

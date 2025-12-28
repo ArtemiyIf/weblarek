@@ -14,14 +14,6 @@ export abstract class Card<T> extends Component<TCardData & T> {
         this.priceElem = container.querySelector('.card__price')!;
     }
 
-    getId(): string {
-        return this.container.dataset.id || '';
-    }
-
-    setId(id: string): void {
-        this.container.dataset.id = id;
-    }
-
     set title(value: string) {
         this.titleElem.textContent = value;
     }

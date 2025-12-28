@@ -10,6 +10,13 @@ export class Basket {
         this.events = events;
     }
 
+    render(): { items: IProduct[], total: number } {
+        return {
+            items: [...this.items],
+            total: this.total
+        };
+    }
+
     getItems(): IProduct[] {
         return [...this.items];
     }

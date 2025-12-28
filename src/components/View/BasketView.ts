@@ -29,4 +29,8 @@ export class BasketView extends Component<{ items: HTMLElement[], total: number 
         this.priceElem.textContent = value.toFixed(2);
         this.buttonOrder.disabled = value === 0;
     }
+    
+    setButtonState(isDisabled: boolean) {
+        this.buttonOrder.disabled = isDisabled;
+    }
 }
