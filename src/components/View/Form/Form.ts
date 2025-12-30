@@ -20,9 +20,4 @@ export abstract class Form<T> extends Component<T> {
             this.submitBtnElem.disabled = false;
         }
     }
-
-    // Очистить ошибки
-    clearErrors(): void {
-        this.errors = [];
-    }
 }

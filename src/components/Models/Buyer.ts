@@ -1,7 +1,5 @@
 import { IBuyer, TPayment } from '../../types';
 import { EventEmitter } from '../base/Events';
-import { eventNames } from '../../utils/constants';
-
 export class Buyer {
     private _payment: TPayment = 'card';
     private _email: string = '';
@@ -18,19 +16,15 @@ export class Buyer {
         switch (key) {
             case 'payment':
                 this._payment = value;
-                this.events.emit(eventNames.CUSTOMER_SET_PAYMENT);
                 break;
             case 'email':
                 this._email = value;
-                this.events.emit(eventNames.CUSTOMER_SET_EMAIL);
                 break;
             case 'phone':
                 this._phone = value;
-                this.events.emit(eventNames.CUSTOMER_SET_PHONE);
                 break;
             case 'address':
                 this._address = value;
-                this.events.emit(eventNames.CUSTOMER_SET_ADDRESS);
                 break;
         }
         //  ИСПРАВЛЕНИЕ 8: Генерируем событие forms:change после изменения данных

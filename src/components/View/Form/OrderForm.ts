@@ -90,7 +90,7 @@ export class OrderForm extends Form<TOrderForm> {
         this.submitBtnElem.disabled = !isValid;
     }
 
-    // 🔧 ИСПРАВЛЕНИЕ: Обновленный метод render
+    // 🔧 ИСПРАВЛЕНИЕ: Обновленный метод render (БЕЗ вызова clearErrors)
     render(data?: TOrderForm): HTMLElement {
         // Если переданы данные - обновляем форму
         if (data) {
@@ -102,12 +102,19 @@ export class OrderForm extends Form<TOrderForm> {
                 this.errors = [data.error];
                 this.submitBtnElem.disabled = true;
             } else {
-                this.clearErrors();
+                // ВАЖНО: вместо clearErrors() устанавливаем пустой массив
+                this.errors = [];
                 this.submitBtnElem.disabled = false;
             }
+        } else {
+            // Если данных нет, очищаем форму и ошибки
+            this.payment = 'card'; // значение по умолчанию
+            this.address = '';
+            this.errors = [];
+            this.submitBtnElem.disabled = false;
         }
         
-        // Всегда возвращаем контейнер (даже если данных нет)
+        // Всегда возвращаем контейнер
         return this.container;
     }
 }

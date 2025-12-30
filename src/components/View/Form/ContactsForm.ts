@@ -61,7 +61,7 @@ export class ContactsForm extends Form<TContactsForm> {
         this.submitBtnElem.disabled = !isValid;
     }
 
-    //  ИСПРАВЛЕНИЕ: Обновленный метод render
+    //  ИСПРАВЛЕНИЕ: Обновленный метод render (БЕЗ вызова clearErrors)
     render(data?: TContactsForm): HTMLElement {
         // Если переданы данные - обновляем форму
         if (data) {
@@ -72,7 +72,8 @@ export class ContactsForm extends Form<TContactsForm> {
             if (data.error) {
                 this.errors = [data.error];
             } else {
-                this.clearErrors();
+                // ВАЖНО: вместо clearErrors() устанавливаем пустой массив
+                this.errors = [];
             }
         }
 
